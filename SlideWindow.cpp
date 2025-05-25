@@ -213,6 +213,7 @@ void SlideWindow::animateSlide(bool visible)
     if (visible) {
         if (!isVisible()) {
             this->show();  // only show if hidden
+            this->raise();
         }
     }
 
@@ -236,10 +237,14 @@ void SlideWindow::animateSlide(bool visible)
             break;
     }
 
+    QPoint actualStart = visible ? start : pos();
+    QPoint actualEnd = visible ? end : start;
+
     m_animation->stop();
-    m_animation->setStartValue(start);
-    m_animation->setEndValue(end);
-    m_animation->setDuration(250);
+    m_animation->setStartValue(actualStart);
+    m_animation->setEndValue(actualEnd);
+    m_animation->setDuration(500);
+    m_animation->setEasingCurve(QEasingCurve::OutCubic);
     m_animation->start();
 
     connect(m_animation, &QPropertyAnimation::finished, this, [this, visible]() {

@@ -17,8 +17,13 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     heightSpin->setRange(10, 100);
     heightSpin->setValue(75);
 
+    QLabel *widthLabel = new QLabel("Window Width (%):");
+    widthSpin = new QSpinBox;
+    widthSpin->setRange(10, 100);
+    widthSpin->setValue(15);
+
     QLabel *hotkeyLabel = new QLabel("Hotkey:");
-    hotkeyEdit = new QLineEdit;
+    hotkeyEdit = new QKeySequenceEdit(this);
 
     QPushButton *okButton = new QPushButton("OK");
     QPushButton *cancelButton = new QPushButton("Cancel");
@@ -31,6 +36,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     layout->addWidget(directionCombo);
     layout->addWidget(heightLabel);
     layout->addWidget(heightSpin);
+    layout->addWidget(widthLabel);
+    layout->addWidget(widthSpin);
     layout->addWidget(hotkeyLabel);
     layout->addWidget(hotkeyEdit);
 
@@ -54,14 +61,23 @@ void SettingsDialog::setHeightPercent(double percent) {
     heightSpin->setValue(static_cast<int>(percent));
 }
 
+void SettingsDialog::setWidthPercent(double percent) {
+    widthSpin->setValue(static_cast<int>(percent));
+}
+
 double SettingsDialog::heightPercent() const {
     return heightSpin->value();
 }
 
+double SettingsDialog::widthPercent() const {
+    return widthSpin->value();
+}
+
 void SettingsDialog::setHotkeySequence(const QString &sequence) {
-    hotkeyEdit->setText(sequence);
+    hotkeyEdit->keySequence().fromString(sequence);
+    //hotkeyEdit->
 }
 
 QString SettingsDialog::hotkeySequence() const {
-    return hotkeyEdit->text();
+    return hotkeyEdit->keySequence().toString();
 }

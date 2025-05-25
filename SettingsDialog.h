@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QComboBox>
 #include <QSpinBox>
-#include <QLineEdit>
+#include <QKeySequenceEdit>
 #include <QPushButton>
 
 class SettingsDialog : public QDialog
@@ -16,8 +16,10 @@ public:
     void setSlideDirection(int directionIndex);
     int slideDirection() const;
 
-    void setHeightPercent(double percent);
+    void setHeightPercent(double hpercent);
     double heightPercent() const;
+    void setWidthPercent(double wpercent);
+    double widthPercent() const;
 
     void setHotkeySequence(const QString &sequence);
     QString hotkeySequence() const;
@@ -25,7 +27,8 @@ public:
 private:
     QComboBox *directionCombo;
     QSpinBox *heightSpin;
-    QLineEdit *hotkeyEdit;
+    QSpinBox *widthSpin;
+    QKeySequenceEdit *hotkeyEdit;
 };
 
 #endif // SETTINGSDIALOG_H
