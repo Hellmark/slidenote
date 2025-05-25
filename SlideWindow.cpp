@@ -38,14 +38,15 @@ void SlideWindow::setupUI()
     connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, &SlideWindow::closeTab);
 
     QAction *newNote = m_toolBar->addAction(QIcon::fromTheme("document-new"), "New");
-    m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open");
+    QAction *openNote = m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open");
     QAction *saveNote = m_toolBar->addAction(QIcon::fromTheme("document-save"), "Save");
-    QAction *closeNote = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
+    QAction *saveAllNote = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
     QAction *settings = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
 
     connect(newNote, &QAction::triggered, this, &SlideWindow::addNewTab);
+    connect(openNote, &QAction::triggered, this, &SlideWindow::openNote);
     connect(saveNote, &QAction::triggered, this, &SlideWindow::saveCurrentNote);
-    connect(closeNote, &QAction::triggered, this, &SlideWindow::closeCurrentTab);
+    connect(saveAllNote, &QAction::triggered, this, &SlideWindow::saveAllNotes);
     connect(settings, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -61,6 +62,7 @@ void SlideWindow::addNewTab()
 {
     auto *edit = new QTextEdit(this);
     int index = m_tabWidget->addTab(edit, "Untitled");
+    m_filePaths[edit] = QString();
     m_tabWidget->setCurrentIndex(index);
     connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
 }
@@ -89,6 +91,55 @@ void SlideWindow::saveCurrentNote()
         m_tabWidget->setTabText(m_tabWidget->currentIndex(), QFileInfo(path).fileName());
     }
 }
+
+void SlideWindow::saveAllNotes()
+{
+    for (int i = 0; i < m_tabWidget->count(); ++i) {
+        QTextEdit *edit = qobject_cast<QTextEdit*>(m_tabWidget->widget(i));
+        if (!edit) continue;
+
+        QString path = m_filePaths.value(edit);
+        if (path.isEmpty()) {
+            path = QFileDialog::getSaveFileName(this, tr("Save Note"), "", tr("Text Files (*.txt);;Markdown Files (*.md);;All Files (*)"));
+            if (path.isEmpty()) continue;
+            m_filePaths[edit] = path;
+            m_tabWidget->setTabText(i, QFileInfo(path).fileName());
+        }
+
+        QFile file(path);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            out << edit->toPlainText();
+            file.close();
+            QString title = m_tabWidget->tabText(i);
+            if (title.endsWith("*"))
+                m_tabWidget->setTabText(i, title.left(title.length() - 1));
+        }
+    }
+}
+
+
+void SlideWindow::openNote()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Note"), "", tr("Text Files (*.txt);;Markdown Files (*.md);;All Files (*)"));
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Error"), tr("Failed to open file."));
+        return;
+    }
+
+    QTextEdit *edit = new QTextEdit(this);
+    edit->setPlainText(file.readAll());
+    int index = m_tabWidget->addTab(edit, QFileInfo(fileName).fileName());
+    m_tabWidget->setCurrentIndex(index);
+    m_filePaths[edit] = fileName;
+
+    connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
+}
+
 
 void SlideWindow::closeCurrentTab()
 {
@@ -123,7 +174,7 @@ void SlideWindow::setupTrayIcon()
 
 void SlideWindow::setupHotkey()
 {
-    m_hotkey = new QHotkey(QKeySequence(m_hotkeySequence.isEmpty() ? "Ctrl+Alt+S" : m_hotkeySequence), true, this);
+    m_hotkey = new QHotkey(QKeySequence(m_hotkeySequence.isEmpty() ? "Alt+F12" : m_hotkeySequence), true, this);
     connect(m_hotkey, &QHotkey::activated, this, &SlideWindow::toggleVisibility);
 }
 
@@ -140,8 +191,6 @@ void SlideWindow::toggleVisibility()
         animateSlide(true);
     }
 }
-
-
 
 void SlideWindow::animateSlide(bool visible)
 {
@@ -234,7 +283,7 @@ void SlideWindow::applyGeometryAndPosition()
 
 void SlideWindow::saveSettings()
 {
-    QSettings settings("MyCompany", "SlideWindowApp");
+    QSettings settings("Hellmark Programming Group", "Slidenote");
     settings.setValue("direction", static_cast<int>(m_direction));
     settings.setValue("height", m_heightPercent);
     settings.setValue("hotkey", m_hotkeySequence);
@@ -242,7 +291,7 @@ void SlideWindow::saveSettings()
 
 void SlideWindow::loadSettings()
 {
-    QSettings settings("MyCompany", "SlideWindowApp");
+    QSettings settings("Hellmark Programming Group", "Slidenote");
     m_direction = static_cast<SlideDirection>(settings.value("direction", static_cast<int>(Left)).toInt());
     m_heightPercent = settings.value("height", 0.75).toDouble();
     m_hotkeySequence = settings.value("hotkey", "Ctrl+Alt+S").toString();

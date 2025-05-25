@@ -8,6 +8,9 @@
 #include <QTabWidget>
 #include <QSettings>
 #include <QString>
+#include <QMap>
+#include <QTextEdit>
+
 
 class QHotkey;
 class QTextEdit;
@@ -42,12 +45,13 @@ private slots:
     void toggleVisibility();
     void animateSlide(bool show);
     void addNewTab();
+    void openNote();
     void saveCurrentNote();
+    void saveAllNotes();
     void closeCurrentTab();
     void closeTab(int index);
     void onTextChanged();
     void showSettingsDialog();
-    //void updateWindowTitle(int index);
 
 private:
     bool m_isSliding = false;
@@ -61,6 +65,7 @@ private:
 
     QToolBar *m_toolBar;
     QTabWidget *m_tabWidget;
+    QMap<QTextEdit*, QString> m_filePaths;
 };
 
 #endif // SLIDEWINDOW_H
