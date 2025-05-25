@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(SlideInApp)
+project(Slidenote)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
@@ -25,7 +25,7 @@ if(UNIX AND NOT APPLE)
     set(EXTRA_LIBS ${X11_LIBRARIES})
 endif()
 
-add_executable(SlideInApp
+add_executable(Slidenote
     main.cpp
     SlideWindow.cpp
     SlideWindow.h
@@ -34,4 +34,4 @@ add_executable(SlideInApp
     SettingsDialog.cpp
 )
 
-target_link_libraries(SlideInApp Qt6::Core Qt6::Gui Qt6::Widgets QHotkey ${EXTRA_LIBS})
+target_link_libraries(Slidenote Qt6::Core Qt6::Gui Qt6::Widgets QHotkey ${EXTRA_LIBS})
