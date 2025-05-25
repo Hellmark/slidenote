@@ -43,7 +43,7 @@ void SlideWindow::setupUI()
     QAction *saveAllNote = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
     m_toolBar->addSeparator();
     QAction *settings = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
-    QAction *quitApp = m_toolBar->addAction(QIcon::fromTheme("ApplicationExit"),"Quit");
+    QAction *quitApp = m_toolBar->addAction(QIcon::fromTheme("application-exit"),"Quit");
 
     connect(quitApp, &QAction::triggered, qApp, &QApplication::quit);
 
@@ -163,7 +163,7 @@ void SlideWindow::closeTab(int index)
 
 void SlideWindow::setupTrayIcon()
 {
-    m_trayIcon = new QSystemTrayIcon(QIcon(":/Slidenote-128.png"), this);
+    m_trayIcon = new QSystemTrayIcon(QIcon(":/Slidenote.svg"), this);
     QMenu *menu = new QMenu(this);
 
     QAction *toggleAction = menu->addAction("Toggle Window");
@@ -243,8 +243,8 @@ void SlideWindow::animateSlide(bool visible)
     m_animation->stop();
     m_animation->setStartValue(actualStart);
     m_animation->setEndValue(actualEnd);
-    m_animation->setDuration(500);
     m_animation->setEasingCurve(QEasingCurve::OutCubic);
+    m_animation->setDuration(500);
     m_animation->start();
 
     connect(m_animation, &QPropertyAnimation::finished, this, [this, visible]() {
