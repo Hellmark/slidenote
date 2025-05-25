@@ -41,13 +41,20 @@ void SlideWindow::setupUI()
     QAction *openNote = m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open");
     QAction *saveNote = m_toolBar->addAction(QIcon::fromTheme("document-save"), "Save");
     QAction *saveAllNote = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
+    m_toolBar->addSeparator();
     QAction *settings = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
+    QAction *quitApp = m_toolBar->addAction(QIcon::fromTheme("ApplicationExit"),"Quit");
+
+    connect(quitApp, &QAction::triggered, qApp, &QApplication::quit);
+
 
     connect(newNote, &QAction::triggered, this, &SlideWindow::addNewTab);
     connect(openNote, &QAction::triggered, this, &SlideWindow::openNote);
     connect(saveNote, &QAction::triggered, this, &SlideWindow::saveCurrentNote);
     connect(saveAllNote, &QAction::triggered, this, &SlideWindow::saveAllNotes);
+    //connect(closeNote, &QAction::triggered, this, &SlideWindow::closeCurrentTab);
     connect(settings, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
+    connect(quitApp, &QAction::triggered, qApp, &QApplication::quit);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(m_toolBar);
@@ -156,7 +163,7 @@ void SlideWindow::closeTab(int index)
 
 void SlideWindow::setupTrayIcon()
 {
-    m_trayIcon = new QSystemTrayIcon(QIcon::fromTheme("applications-utilities"), this);
+    m_trayIcon = new QSystemTrayIcon(QIcon(":/Slidenote-128.png"), this);
     QMenu *menu = new QMenu(this);
 
     QAction *toggleAction = menu->addAction("Toggle Window");
@@ -196,7 +203,7 @@ void SlideWindow::animateSlide(bool visible)
 {
     disconnect(m_animation, nullptr, nullptr, nullptr);  // disconnect all animation signals
 
-    QRect screen = QGuiApplication::primaryScreen()->geometry();
+    QRect screen = QGuiApplication::screenAt(QCursor::pos())->geometry();
     int w = width();
     int h = screen.height() * m_heightPercent;
 
@@ -249,11 +256,13 @@ void SlideWindow::showSettingsDialog()
     SettingsDialog dlg(this);
     dlg.setSlideDirection(static_cast<int>(m_direction));
     dlg.setHeightPercent(m_heightPercent * 100);
+    dlg.setWidthPercent(m_widthPercent * 100);
     dlg.setHotkeySequence(m_hotkeySequence);
 
     if (dlg.exec() == QDialog::Accepted) {
         m_direction = static_cast<SlideDirection>(dlg.slideDirection());
         m_heightPercent = dlg.heightPercent() / 100.0;
+        m_widthPercent = dlg.widthPercent() / 100.0;
         m_hotkeySequence = dlg.hotkeySequence();
         setupHotkey();
         applyGeometryAndPosition();
@@ -263,10 +272,11 @@ void SlideWindow::showSettingsDialog()
 
 void SlideWindow::applyGeometryAndPosition()
 {
-    QRect screen = QGuiApplication::primaryScreen()->geometry();
+    QRect screen = QGuiApplication::screenAt(QCursor::pos())->geometry();
     int h = screen.height() * m_heightPercent;
-    int w = width();
+    int w = screen.width() * m_widthPercent;
     QPoint pos;
+    setFixedSize(w, h);
 
     if (m_direction == Left) {
         pos = QPoint(-w, (screen.height() - h) / 2);
@@ -286,6 +296,7 @@ void SlideWindow::saveSettings()
     QSettings settings("Hellmark Programming Group", "Slidenote");
     settings.setValue("direction", static_cast<int>(m_direction));
     settings.setValue("height", m_heightPercent);
+    settings.setValue("width", m_widthPercent);
     settings.setValue("hotkey", m_hotkeySequence);
 }
 
@@ -294,5 +305,6 @@ void SlideWindow::loadSettings()
     QSettings settings("Hellmark Programming Group", "Slidenote");
     m_direction = static_cast<SlideDirection>(settings.value("direction", static_cast<int>(Left)).toInt());
     m_heightPercent = settings.value("height", 0.75).toDouble();
-    m_hotkeySequence = settings.value("hotkey", "Ctrl+Alt+S").toString();
+    m_widthPercent = settings.value("width", 0.15).toDouble();
+    m_hotkeySequence = settings.value("hotkey", "Alt+F12").toString();
 }

@@ -30,7 +30,8 @@ public:
     explicit SlideWindow(QWidget *parent = nullptr);
 
     void setSlideDirection(SlideDirection dir);
-    void setHeightPercent(double percent);
+    void setHeightPercent(double hpercent);
+    void setWidthPercent(double wpercent);
     void setHotkeySequence(const QString &seq);
 
 protected:
@@ -57,6 +58,7 @@ private:
     bool m_isSliding = false;
     SlideDirection m_direction;
     double m_heightPercent;
+    double m_widthPercent;
     QString m_hotkeySequence;
 
     QSystemTrayIcon *m_trayIcon;
