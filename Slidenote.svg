@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   id="svg3041"
+   version="1.1"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   width="128"
+   height="128"
+   sodipodi:docname="slidenote.svg"
+   inkscape:export-filename="sidenote-48.png"
+   inkscape:export-xdpi="36"
+   inkscape:export-ydpi="36"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title820">Slidenote Icon</title>
+  <metadata
+     id="metadata3047">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Slidenote Icon</dc:title>
+        <dc:date>5/25/2025</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Keith &quot;Hellmark&quot; Brown</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-nc-sa/4.0/" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:prohibits
+           rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#ShareAlike" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3045">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3817">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop3819" />
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:0;"
+         offset="1"
+         id="stop3821" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3941">
+      <stop
+         style="stop-color:#81b735;stop-opacity:1;"
+         offset="0"
+         id="stop3943" />
+      <stop
+         style="stop-color:#818e35;stop-opacity:1;"
+         offset="1"
+         id="stop3945" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3941"
+       id="linearGradient3045"
+       gradientUnits="userSpaceOnUse"
+       x1="57.506226"
+       y1="11.966102"
+       x2="59.347462"
+       y2="8.2711859" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3817"
+       id="linearGradient3823"
+       x1="208.27477"
+       y1="19.896049"
+       x2="206.73547"
+       y2="24.158638"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-129.63011,1.5771958)" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1128"
+     id="namedview3043"
+     showgrid="false"
+     inkscape:zoom="4.8538653"
+     inkscape:cx="48.724055"
+     inkscape:cy="76.536941"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3041"
+     inkscape:snap-global="false"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <g
+     id="g3011"
+     transform="translate(0.07978928,1.5771958)"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507">
+    <path
+       style="fill:url(#linearGradient3045);fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 39.050847,0 72.135593,14.915254 81.627119,23.59322 68.067797,20.610169 36.338983,7.5932203 c 0,0 -1.627119,-4.338983 2.711864,-7.5932203 z"
+       id="path3013"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#e8cbaf;fill-opacity:1;stroke:none"
+       d="m 80,22.779661 -7.864406,-7.050848 c 0,0 -4.338984,0.271187 -2.711865,4.61017 C 72.677966,21.152542 80,22.779661 80,22.779661 Z"
+       id="path3015"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+  </g>
+  <path
+     inkscape:connector-curvature="0"
+     id="path3017"
+     d="M 10.113689,102.35686 65.435719,127.84839 120.21538,102.62805 66.249279,77.950077 Z"
+     style="fill:#000000;fill-opacity:0.509804;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path3019"
+     d="M 6.0458893,60.153468 64.893349,87.814485 V 111.6789 L 5.8403393,85.616498 Z"
+     style="fill:#a79c79;fill-opacity:1"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path3021"
+     d="M 13.256509,59.479821 68.147589,35.746687 122.65606,61.780586 70.045889,86.187365 Z"
+     style="fill:#cecbaf;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path3023"
+     d="m 123.19843,61.238213 0.54238,22.237288 -53.423731,23.835909 -0.72168,-21.639533 z"
+     style="fill:#6e5f40;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3025"
+     d="m 64.622159,111.40771 4.61017,-1.89831 V 86.458552 l -4.61017,1.627119 z"
+     style="fill:#6e5f40;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3027"
+     d="m 5.2323293,60.424654 5.4237297,-2.169492 58.84746,27.661017 -4.88136,1.898305 z"
+     style="fill:#cecbaf;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path3029"
+     d="m 19.716629,62.622643 19.96502,9.360252 25.48289,-13.727733 -0.27119,-17.016949 z"
+     style="fill:#6e5f40;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3031"
+     d="M 114.24928,61.780586 95.537419,70.729738 64.893349,57.170416 65.164539,41.441603 Z"
+     style="fill:#a79c79;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path3033"
+     d="M 65.435719,61.238213 42.730339,73.338828 66.118009,84.49461 89.300129,73.170416 Z"
+     style="fill:#5d5a4b;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3035"
+     d="m 27.740809,79.950077 -0.54238,2.169492 12.74577,5.694915 1.08474,-1.627119 z"
+     style="fill:#d1cfb3;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3037"
+     d="m 39.944199,87.272111 v 5.152543 l 1.62712,-0.271187 0.27118,-5.966102 z"
+     style="fill:#6e5f40;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccccccccc"
+     inkscape:connector-curvature="0"
+     id="path3039"
+     d="M 64.079789,36.560247 123.46962,61.509399 V 83.475501 L 70.588269,107.6111 v 2.16949 l -5.96611,2.16949 -59.1186397,-26.033901 0.27119,-25.220339 4.8813497,-2.169491 2.16949,0.813559 z"
+     style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path3041"
+     d="m 58.113689,25.170416 -36.33898,16.81356 46.37288,21.423728 35.254231,-16.813559 z"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path3043"
+     d="m 68.895509,86.187365 v 23.593225 l 1.28166,-0.27118 -0.0656,-24.286739 z"
+     style="fill:#2a2824;fill-opacity:1;stroke:none"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+  <path
+     style="fill:url(#linearGradient3823);fill-opacity:1;stroke:none"
+     d="m 74.737269,23.249325 1.30246,-2.841725 4.7362,4.262587 z"
+     id="path3047"
+     inkscape:connector-curvature="0"
+     inkscape:export-filename="/Users/hellmark/Pictures/glidenote.png"
+     inkscape:export-xdpi="357.82507"
+     inkscape:export-ydpi="357.82507" />
+</svg>
