@@ -52,7 +52,6 @@ void SlideWindow::setupUI()
     connect(openNote, &QAction::triggered, this, &SlideWindow::openNote);
     connect(saveNote, &QAction::triggered, this, &SlideWindow::saveCurrentNote);
     connect(saveAllNote, &QAction::triggered, this, &SlideWindow::saveAllNotes);
-    //connect(closeNote, &QAction::triggered, this, &SlideWindow::closeCurrentTab);
     connect(settings, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
     connect(quitApp, &QAction::triggered, qApp, &QApplication::quit);
 
