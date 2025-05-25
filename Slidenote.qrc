@@ -1,5 +1,12 @@
 <RCC>
-    <qresource prefix="/">
-        <file>icon.png</file>
+    <qresource prefix="/icons/">
+        <file>Slidenote-16.png</file>
+        <file>Slidenote-22.png</file>
+        <file>Slidenote-32.png</file>
+        <file>Slidenote-48.png</file>
+        <file>Slidenote-64.png</file>
+        <file>Slidenote-128.png</file>
+        <file>Slidenote-256.png</file>
+        <file>Slidenote.svg</file>
     </qresource>
 </RCC>
