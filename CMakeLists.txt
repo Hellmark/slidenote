@@ -29,7 +29,7 @@ add_executable(SlideInApp
     main.cpp
     SlideWindow.cpp
     SlideWindow.h
-    SlideWindow.qrc
+    Slidenote.qrc
     SettingsDialog.h
     SettingsDialog.cpp
 )
