@@ -2,72 +2,65 @@
 #define SLIDEWINDOW_H
 
 #include <QWidget>
-#include <QSystemTrayIcon>
-#include <QPropertyAnimation>
-#include <QToolBar>
-#include <QTabWidget>
-#include <QSettings>
-#include <QString>
 #include <QMap>
 #include <QTextEdit>
 
-
+class QTabWidget;
+class QToolBar;
+class QPropertyAnimation;
+class QSystemTrayIcon;
 class QHotkey;
-class QTextEdit;
 
-class SlideWindow : public QWidget
-{
+class SlideWindow : public QWidget {
     Q_OBJECT
+
 public:
-    enum SlideDirection {
-        Left,
-        Right,
-        Top,
-        Bottom
-    };
-    Q_ENUM(SlideDirection)
+    ~SlideWindow();
+    enum SlideDirection { Left, Right, Top, Bottom };
+    SlideWindow(QWidget *parent = nullptr);
 
-    explicit SlideWindow(QWidget *parent = nullptr);
+private slots:
+    void addNewTab();
+    void onTextChanged();
+    void saveCurrentNote();
+    void saveAllNotes();
+    void openNote();
+    void closeTab(int index);
+    void toggleVisibility();
+    void showSettingsDialog();
 
-    void setSlideDirection(SlideDirection dir);
-    void setHeightPercent(double hpercent);
-    void setWidthPercent(double wpercent);
-    void setHotkeySequence(const QString &seq);
-
-protected:
+private:
+    void loadLastSession();
+    void saveLastSession();
     void setupUI();
     void setupTrayIcon();
     void setupHotkey();
+    void animateSlide(bool visible);
     void applyGeometryAndPosition();
     void saveSettings();
     void loadSettings();
 
-private slots:
-    void toggleVisibility();
-    void animateSlide(bool show);
-    void addNewTab();
-    void openNote();
-    void saveCurrentNote();
-    void saveAllNotes();
-    void closeCurrentTab();
-    void closeTab(int index);
-    void onTextChanged();
-    void showSettingsDialog();
+    void setSlideDirection(SlideDirection direction) { m_direction = direction; }
+    void setHeightPercent(double percent) { m_heightPercent = percent; }
+    void setWidthPercent(double percent) { m_widthPercent = percent; }
+    void setHotkeySequence(const QString &sequence) { m_hotkeySequence = sequence; }
+    void setScreenIndex(int index) { m_screenIndex = index; }
 
-private:
-    bool m_isSliding = false;
+    QTabWidget *m_tabWidget;
+    QToolBar *m_toolBar;
+    QWidget *m_contentWidget;
+    QMap<QTextEdit*, QString> m_filePaths;
+    QPropertyAnimation *m_animation;
+    QSystemTrayIcon *m_trayIcon;
+    QHotkey *m_hotkey;
+
     SlideDirection m_direction;
     double m_heightPercent;
     double m_widthPercent;
     QString m_hotkeySequence;
-
-    QSystemTrayIcon *m_trayIcon;
-    QPropertyAnimation *m_animation;
-    QHotkey *m_hotkey;
-
-    QToolBar *m_toolBar;
-    QTabWidget *m_tabWidget;
-    QMap<QTextEdit*, QString> m_filePaths;
+    int m_screenIndex;
+    bool m_isSliding;
+    bool m_reopenLastSession;
 };
 
 #endif // SLIDEWINDOW_H

@@ -7,28 +7,39 @@
 #include <QKeySequenceEdit>
 #include <QPushButton>
 
-class SettingsDialog : public QDialog
-{
+#include <QCheckBox>
+
+class SettingsDialog : public QDialog {
     Q_OBJECT
+    
 public:
     explicit SettingsDialog(QWidget *parent = nullptr);
 
     void setSlideDirection(int directionIndex);
     int slideDirection() const;
 
-    void setHeightPercent(double hpercent);
+    void setHeightPercent(double percent);
     double heightPercent() const;
-    void setWidthPercent(double wpercent);
+
+    void setWidthPercent(double percent);
     double widthPercent() const;
 
     void setHotkeySequence(const QString &sequence);
     QString hotkeySequence() const;
 
+    void setScreenIndex(int index);
+    int screenIndex() const;
+
+    void setReopenLastSession(bool enabled);
+    bool reopenLastSession() const;
+
 private:
+    QCheckBox *reopenCheck;
     QComboBox *directionCombo;
     QSpinBox *heightSpin;
     QSpinBox *widthSpin;
     QKeySequenceEdit *hotkeyEdit;
+    QComboBox *screenCombo;
 };
 
 #endif // SETTINGSDIALOG_H

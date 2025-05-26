@@ -1,8 +1,8 @@
 #include <QApplication>
+#include <QSystemTrayIcon>
 #include "SlideWindow.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {

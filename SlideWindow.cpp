@@ -1,8 +1,11 @@
+
 #include "SlideWindow.h"
+#include <QPropertyAnimation>
 #include "SettingsDialog.h"
 
 #include <QApplication>
 #include <QScreen>
+#include <QCursor>
 #include <QVBoxLayout>
 #include <QTextEdit>
 #include <QToolBar>
@@ -10,17 +13,27 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMenu>
+#include <QSystemTrayIcon>
 #include <QHotkey>
+#include <QSettings>
+#include <QFileInfo>
+#include <QTabWidget>
+#include <QTimer>
 
 SlideWindow::SlideWindow(QWidget *parent)
     : QWidget(parent),
       m_direction(Left),
       m_heightPercent(0.75),
+      m_widthPercent(0.3),
+      m_screenIndex(0),
+      m_isSliding(false),
       m_hotkey(nullptr),
       m_trayIcon(nullptr),
       m_animation(new QPropertyAnimation(this, "pos", this))
 {
     setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+
     setupUI();
     setupTrayIcon();
     loadSettings();
@@ -28,78 +41,203 @@ SlideWindow::SlideWindow(QWidget *parent)
     applyGeometryAndPosition();
 }
 
-void SlideWindow::setupUI()
-{
-    m_toolBar = new QToolBar(this);
-    m_tabWidget = new QTabWidget(this);
+void SlideWindow::setupUI() {
+    m_contentWidget = new QWidget(this);
+    m_contentWidget->setStyleSheet("background-color: palette(window);");
+    m_contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_toolBar = new QToolBar(m_contentWidget);
+    m_tabWidget = new QTabWidget(m_contentWidget);
+
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setMovable(true);
-
     connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, &SlideWindow::closeTab);
 
-    QAction *newNote = m_toolBar->addAction(QIcon::fromTheme("document-new"), "New");
-    QAction *openNote = m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open");
-    QAction *saveNote = m_toolBar->addAction(QIcon::fromTheme("document-save"), "Save");
-    QAction *saveAllNote = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
+    QAction *newNoteAction = m_toolBar->addAction(QIcon::fromTheme("document-new"), "New Note");
+    QAction *openNoteAction = m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open Note");
+    QAction *saveAction = m_toolBar->addAction(QIcon::fromTheme("document-save"), "Save");
+    QAction *saveAllAction = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
     m_toolBar->addSeparator();
-    QAction *settings = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
-    QAction *quitApp = m_toolBar->addAction(QIcon::fromTheme("application-exit"),"Quit");
+    QAction *settingsAction = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
+    m_toolBar->addSeparator();
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    m_toolBar->addWidget(spacer);
+    QAction *exitAction = m_toolBar->addAction(QIcon::fromTheme("application-exit"), "Exit");
 
-    connect(quitApp, &QAction::triggered, qApp, &QApplication::quit);
+    connect(newNoteAction, &QAction::triggered, this, &SlideWindow::addNewTab);
+    connect(openNoteAction, &QAction::triggered, this, &SlideWindow::openNote);
+    connect(saveAction, &QAction::triggered, this, &SlideWindow::saveCurrentNote);
+    connect(saveAllAction, &QAction::triggered, this, &SlideWindow::saveAllNotes);
+    connect(settingsAction, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
+    connect(exitAction, &QAction::triggered, qApp, &QApplication::quit);
 
+    QVBoxLayout *innerLayout = new QVBoxLayout(m_contentWidget);
+    innerLayout->setContentsMargins(0, 0, 0, 0);
+    innerLayout->addWidget(m_toolBar);
+    innerLayout->addWidget(m_tabWidget);
 
-    connect(newNote, &QAction::triggered, this, &SlideWindow::addNewTab);
-    connect(openNote, &QAction::triggered, this, &SlideWindow::openNote);
-    connect(saveNote, &QAction::triggered, this, &SlideWindow::saveCurrentNote);
-    connect(saveAllNote, &QAction::triggered, this, &SlideWindow::saveAllNotes);
-    connect(settings, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
-    connect(quitApp, &QAction::triggered, qApp, &QApplication::quit);
+    QVBoxLayout *outerLayout = new QVBoxLayout(this);
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(m_toolBar);
-    layout->addWidget(m_tabWidget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    setLayout(layout);
-
-    addNewTab();
+    loadLastSession();
+    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->addWidget(m_contentWidget);
+    setLayout(outerLayout);
 }
 
-void SlideWindow::addNewTab()
-{
-    auto *edit = new QTextEdit(this);
+void SlideWindow::addNewTab() {
+    QTextEdit *edit = new QTextEdit(this);
     int index = m_tabWidget->addTab(edit, "Untitled");
-    m_filePaths[edit] = QString();
     m_tabWidget->setCurrentIndex(index);
+    m_filePaths[edit] = QString();
     connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
 }
 
-void SlideWindow::onTextChanged()
-{
-    int index = m_tabWidget->currentIndex();
+void SlideWindow::onTextChanged() {
+    QTextEdit *edit = qobject_cast<QTextEdit*>(sender());
+    int index = m_tabWidget->indexOf(edit);
     QString title = m_tabWidget->tabText(index);
-    if (!title.endsWith("*")) {
+    if (!title.endsWith("*"))
         m_tabWidget->setTabText(index, title + "*");
-    }
 }
 
-void SlideWindow::saveCurrentNote()
-{
-    auto *edit = qobject_cast<QTextEdit *>(m_tabWidget->currentWidget());
+void SlideWindow::applyGeometryAndPosition() {
+    QScreen *screen = (m_screenIndex == 0)
+        ? QGuiApplication::screenAt(QCursor::pos())
+        : QGuiApplication::screens().value(m_screenIndex - 1, QGuiApplication::primaryScreen());
+
+    QRect geometry = screen->geometry();
+    int h = geometry.height() * m_heightPercent;
+    int w = geometry.width() * m_widthPercent;
+
+    if (w <= 0 || h <= 0) {
+        qWarning("Invalid window size: width=%d, height=%d", w, h);
+        return;
+    }
+
+    setFixedSize(w, h);
+
+    QPoint pos;
+    switch (m_direction) {
+        case Left: pos = QPoint(geometry.left() - w, geometry.top() + (geometry.height() - h) / 2); break;
+        case Right: pos = QPoint(geometry.x() + geometry.width() - w, geometry.top() + (geometry.height() - h) / 2); break;
+        case Top: pos = QPoint(geometry.left() + (geometry.width() - w) / 2, geometry.top() - h); break;
+        case Bottom: pos = QPoint(geometry.left() + (geometry.width() - w) / 2, geometry.top() + geometry.height()); break;
+    }
+
+    qDebug("Applying geometry: size=%dx%d, pos=(%d,%d)", w, h, pos.x(), pos.y());
+    move(pos);
+}
+
+void SlideWindow::animateSlide(bool visible) {
+    qDebug() << "Animated toggle: visible =" << visible;
+
+    QScreen *screen = (m_screenIndex == 0)
+        ? QGuiApplication::screenAt(QCursor::pos())
+        : QGuiApplication::screens().value(m_screenIndex - 1, QGuiApplication::primaryScreen());
+
+    QRect screenGeometry = screen->geometry();
+    int h = screenGeometry.height() * m_heightPercent;
+    int w = screenGeometry.width() * m_widthPercent;
+
+    setFixedSize(w, h);
+    m_contentWidget->resize(w, h);
+
+    // Position the window itself based on direction
+    int windowX = 0, windowY = 0;
+    if (m_direction == Left || m_direction == Right) {
+        windowY = screenGeometry.top() + (screenGeometry.height() - h) / 2;
+        windowX = (m_direction == Left) ? screenGeometry.left() : screenGeometry.right() - w;
+    } else {
+        windowX = screenGeometry.left() + (screenGeometry.width() - w) / 2;
+        windowY = (m_direction == Top) ? screenGeometry.top() : screenGeometry.bottom() - h;
+    }
+    move(windowX, windowY);
+
+    QPoint start, end;
+
+    if (m_direction == Left) {
+        start = visible ? QPoint(-w, 0) : QPoint(0, 0);
+        end = visible ? QPoint(0, 0) : QPoint(-w, 0);
+    } else if (m_direction == Right) {
+        start = visible ? QPoint(w, 0) : QPoint(0, 0);
+        end = visible ? QPoint(0, 0) : QPoint(w, 0);
+    } else if (m_direction == Top) {
+        start = visible ? QPoint(0, -h) : QPoint(0, 0);
+        end = visible ? QPoint(0, 0) : QPoint(0, -h);
+    } else if (m_direction == Bottom) {
+        start = visible ? QPoint(0, h) : QPoint(0, 0);
+        end = visible ? QPoint(0, 0) : QPoint(0, h);
+    }
+
+    if (visible) {
+        m_contentWidget->move(start);
+        show();
+        raise();
+        activateWindow();
+    }
+
+    QPropertyAnimation *anim = new QPropertyAnimation(m_contentWidget, "pos");
+    anim->setStartValue(start);
+    anim->setEndValue(end);
+    anim->setDuration(400);
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+
+    connect(anim, &QPropertyAnimation::finished, this, [this, visible, anim]() {
+        if (!visible) hide();
+        anim->deleteLater();
+        m_isSliding = false;
+        qDebug() << "Animation finished. Visible now:" << isVisible();
+    });
+
+    m_isSliding = true;
+    anim->start();
+}
+
+void SlideWindow::openNote() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Note"), "", tr("Text Files (*.txt);;Markdown Files (*.md);;All Files (*)"));
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Error"), tr("Failed to open file."));
+        return;
+    }
+
+    QTextEdit *edit = new QTextEdit(this);
+    edit->setPlainText(file.readAll());
+    int index = m_tabWidget->addTab(edit, QFileInfo(fileName).fileName());
+    m_tabWidget->setCurrentIndex(index);
+    m_filePaths[edit] = fileName;
+
+    connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
+}
+
+void SlideWindow::saveCurrentNote() {
+    QTextEdit *edit = qobject_cast<QTextEdit*>(m_tabWidget->currentWidget());
     if (!edit) return;
-    QString path = QFileDialog::getSaveFileName(this, "Save Note");
-    if (path.isEmpty()) return;
+
+    QString path = m_filePaths.value(edit);
+    if (path.isEmpty()) {
+        path = QFileDialog::getSaveFileName(this, tr("Save Note"), "", tr("Text Files (*.txt);;Markdown Files (*.md);;All Files (*)"));
+        if (path.isEmpty()) return;
+        m_filePaths[edit] = path;
+        m_tabWidget->setTabText(m_tabWidget->currentIndex(), QFileInfo(path).fileName());
+    }
 
     QFile file(path);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
         out << edit->toPlainText();
         file.close();
-        m_tabWidget->setTabText(m_tabWidget->currentIndex(), QFileInfo(path).fileName());
+        QString title = m_tabWidget->tabText(m_tabWidget->currentIndex());
+        if (title.endsWith("*"))
+            m_tabWidget->setTabText(m_tabWidget->currentIndex(), title.left(title.length() - 1));
     }
 }
 
-void SlideWindow::saveAllNotes()
-{
+void SlideWindow::saveAllNotes() {
     for (int i = 0; i < m_tabWidget->count(); ++i) {
         QTextEdit *edit = qobject_cast<QTextEdit*>(m_tabWidget->widget(i));
         if (!edit) continue;
@@ -124,191 +262,133 @@ void SlideWindow::saveAllNotes()
     }
 }
 
-
-void SlideWindow::openNote()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Note"), "", tr("Text Files (*.txt);;Markdown Files (*.md);;All Files (*)"));
-    if (fileName.isEmpty())
-        return;
-
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Error"), tr("Failed to open file."));
-        return;
-    }
-
-    QTextEdit *edit = new QTextEdit(this);
-    edit->setPlainText(file.readAll());
-    int index = m_tabWidget->addTab(edit, QFileInfo(fileName).fileName());
-    m_tabWidget->setCurrentIndex(index);
-    m_filePaths[edit] = fileName;
-
-    connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
-}
-
-
-void SlideWindow::closeCurrentTab()
-{
-    int index = m_tabWidget->currentIndex();
-    if (index >= 0) closeTab(index);
-}
-
-void SlideWindow::closeTab(int index)
-{
-    QWidget *w = m_tabWidget->widget(index);
+void SlideWindow::closeTab(int index) {
+    QWidget *widget = m_tabWidget->widget(index);
+    QTextEdit *edit = qobject_cast<QTextEdit*>(widget);
+    if (edit)
+        m_filePaths.remove(edit);
     m_tabWidget->removeTab(index);
-    delete w;
+    widget->deleteLater();
 }
 
-void SlideWindow::setupTrayIcon()
-{
-    m_trayIcon = new QSystemTrayIcon(QIcon(":/Slidenote.svg"), this);
-    QMenu *menu = new QMenu(this);
+void SlideWindow::toggleVisibility() {
+    qDebug() << "Toggling to:" << (!isVisible());
+    if (m_isSliding) qDebug() << "Blocked: already sliding";
+    m_isSliding = true;
+    animateSlide(!isVisible());
+}
 
-    QAction *toggleAction = menu->addAction("Toggle Window");
-    QAction *settingsAction = menu->addAction("Settings");
-    menu->addSeparator();
-    QAction *quitAction = menu->addAction("Quit");
+void SlideWindow::setupTrayIcon() {
+    QMenu *trayMenu = new QMenu(this);
+    QAction *toggleAction = trayMenu->addAction("Toggle Window");
+    QAction *settingsAction = trayMenu->addAction("Settings");
+    trayMenu->addSeparator();
+    QAction *exitAction = trayMenu->addAction("Exit");
 
     connect(toggleAction, &QAction::triggered, this, &SlideWindow::toggleVisibility);
     connect(settingsAction, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
-    connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    connect(exitAction, &QAction::triggered, qApp, &QApplication::quit);
 
-    m_trayIcon->setContextMenu(menu);
+    m_trayIcon = new QSystemTrayIcon(this);
+    m_trayIcon->setIcon(QIcon(":/Slidenote.svg"));
+    m_trayIcon->setContextMenu(trayMenu);
     m_trayIcon->show();
 }
 
-void SlideWindow::setupHotkey()
-{
-    m_hotkey = new QHotkey(QKeySequence(m_hotkeySequence.isEmpty() ? "Alt+F12" : m_hotkeySequence), true, this);
+void SlideWindow::setupHotkey() {
+    if (m_hotkey) {
+        m_hotkey->disconnect();
+        delete m_hotkey;
+    }
+
+    m_hotkey = new QHotkey(QKeySequence(m_hotkeySequence), true, this);
     connect(m_hotkey, &QHotkey::activated, this, &SlideWindow::toggleVisibility);
 }
 
-void SlideWindow::toggleVisibility()
-{
-    if (m_isSliding)
-        return;
-
-    m_isSliding = true;
-
-    if (isVisible()) {
-        animateSlide(false);
-    } else {
-        animateSlide(true);
-    }
-}
-
-void SlideWindow::animateSlide(bool visible)
-{
-    disconnect(m_animation, nullptr, nullptr, nullptr);  // disconnect all animation signals
-
-    QRect screen = QGuiApplication::screenAt(QCursor::pos())->geometry();
-    int w = width();
-    int h = screen.height() * m_heightPercent;
-
-    setFixedSize(w, h);
-    QPoint start, end;
-
-    if (visible) {
-        if (!isVisible()) {
-            this->show();  // only show if hidden
-            this->raise();
-        }
-    }
-
-    // Calculate animation positions
-    switch (m_direction) {
-        case Left:
-            start = QPoint(visible ? -w : x(), (screen.height() - h) / 2);
-            end = QPoint(visible ? 0 : -w, start.y());
-            break;
-        case Right:
-            start = QPoint(visible ? screen.width() : x(), (screen.height() - h) / 2);
-            end = QPoint(visible ? screen.width() - w : screen.width(), start.y());
-            break;
-        case Top:
-            start = QPoint((screen.width() - w) / 2, visible ? -h : y());
-            end = QPoint(start.x(), visible ? 0 : -h);
-            break;
-        case Bottom:
-            start = QPoint((screen.width() - w) / 2, visible ? screen.height() : y());
-            end = QPoint(start.x(), visible ? screen.height() - h : screen.height());
-            break;
-    }
-
-    QPoint actualStart = visible ? start : pos();
-    QPoint actualEnd = visible ? end : start;
-
-    m_animation->stop();
-    m_animation->setStartValue(actualStart);
-    m_animation->setEndValue(actualEnd);
-    m_animation->setEasingCurve(QEasingCurve::OutCubic);
-    m_animation->setDuration(500);
-    m_animation->start();
-
-    connect(m_animation, &QPropertyAnimation::finished, this, [this, visible]() {
-        if (!visible)
-            this->hide();
-        m_isSliding = false;
-    });
-}
-
-
-
-void SlideWindow::showSettingsDialog()
-{
+void SlideWindow::showSettingsDialog() {
     SettingsDialog dlg(this);
+    QSettings settings("Hellmark Programming Group", "Slidenote");
+    dlg.setReopenLastSession(settings.value("reopenLastSession", false).toBool());
     dlg.setSlideDirection(static_cast<int>(m_direction));
     dlg.setHeightPercent(m_heightPercent * 100);
     dlg.setWidthPercent(m_widthPercent * 100);
     dlg.setHotkeySequence(m_hotkeySequence);
+    dlg.setScreenIndex(m_screenIndex);
 
     if (dlg.exec() == QDialog::Accepted) {
         m_direction = static_cast<SlideDirection>(dlg.slideDirection());
         m_heightPercent = dlg.heightPercent() / 100.0;
         m_widthPercent = dlg.widthPercent() / 100.0;
         m_hotkeySequence = dlg.hotkeySequence();
+        m_screenIndex = dlg.screenIndex();
+        m_reopenLastSession = dlg.reopenLastSession();
+
         setupHotkey();
         applyGeometryAndPosition();
         saveSettings();
     }
 }
 
-void SlideWindow::applyGeometryAndPosition()
-{
-    QRect screen = QGuiApplication::screenAt(QCursor::pos())->geometry();
-    int h = screen.height() * m_heightPercent;
-    int w = screen.width() * m_widthPercent;
-    QPoint pos;
-    setFixedSize(w, h);
-
-    if (m_direction == Left) {
-        pos = QPoint(-w, (screen.height() - h) / 2);
-    } else if (m_direction == Right) {
-        pos = QPoint(screen.width(), (screen.height() - h) / 2);
-    } else if (m_direction == Top) {
-        pos = QPoint((screen.width() - w) / 2, -h);
-    } else {
-        pos = QPoint((screen.width() - w) / 2, screen.height());
-    }
-
-    move(pos);
-}
-
-void SlideWindow::saveSettings()
-{
+void SlideWindow::saveSettings() {
     QSettings settings("Hellmark Programming Group", "Slidenote");
     settings.setValue("direction", static_cast<int>(m_direction));
     settings.setValue("height", m_heightPercent);
     settings.setValue("width", m_widthPercent);
     settings.setValue("hotkey", m_hotkeySequence);
+    settings.setValue("screenIndex", m_screenIndex);
+    settings.setValue("reopenLastSession", m_reopenLastSession);
 }
 
-void SlideWindow::loadSettings()
-{
+void SlideWindow::loadSettings() {
     QSettings settings("Hellmark Programming Group", "Slidenote");
     m_direction = static_cast<SlideDirection>(settings.value("direction", static_cast<int>(Left)).toInt());
     m_heightPercent = settings.value("height", 0.75).toDouble();
-    m_widthPercent = settings.value("width", 0.15).toDouble();
-    m_hotkeySequence = settings.value("hotkey", "Alt+F12").toString();
+    m_widthPercent = settings.value("width", 0.3).toDouble();
+    m_hotkeySequence = settings.value("hotkey", "Ctrl+Alt+S").toString();
+    m_screenIndex = settings.value("screenIndex", 0).toInt();
+    m_reopenLastSession = settings.value("reopenLastSession", true).toBool();
+}
+
+
+void SlideWindow::loadLastSession() {
+    QSettings settings("Hellmark Programming Group", "Slidenote");
+    bool reopen = settings.value("reopenLastSession", false).toBool();
+    int tabCount = settings.beginReadArray("sessionTabs");
+
+    if (!reopen || tabCount == 0) {
+        addNewTab();
+        return;
+    }
+
+    for (int i = 0; i < tabCount; ++i) {
+        settings.setArrayIndex(i);
+        QString title = settings.value("title").toString();
+        QString content = settings.value("content").toString();
+
+        QTextEdit *edit = new QTextEdit(this);
+        edit->setPlainText(content);
+        int index = m_tabWidget->addTab(edit, title);
+        m_tabWidget->setCurrentIndex(index);
+        connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
+    }
+
+    settings.endArray();
+}
+
+void SlideWindow::saveLastSession() {
+    QSettings settings("Hellmark Programming Group", "Slidenote");
+    settings.beginWriteArray("sessionTabs");
+    for (int i = 0; i < m_tabWidget->count(); ++i) {
+        QTextEdit *edit = qobject_cast<QTextEdit*>(m_tabWidget->widget(i));
+        if (!edit) continue;
+
+        settings.setArrayIndex(i);
+        settings.setValue("title", m_tabWidget->tabText(i));
+        settings.setValue("content", edit->toPlainText());
+    }
+    settings.endArray();
+}
+
+SlideWindow::~SlideWindow() {
+    saveLastSession();
 }
