@@ -49,7 +49,7 @@ void SlideWindow::setupUI() {
     new QShortcut(QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
     new QShortcut(QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
     new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(closeCurrentTab()));
-    new QShortcut(QKeySequence("Ctrl+Q"), this, SLOT(close()));
+    new QShortcut(QKeySequence("Ctrl+Q"), this, &QApplication::quit);
     new QShortcut(QKeySequence("Ctrl+,"), this, SLOT(showSettingsDialog()));
     new QShortcut(QKeySequence("F1"), this, SLOT(showAboutDialog()));
 
