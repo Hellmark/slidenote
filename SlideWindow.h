@@ -26,8 +26,10 @@ private slots:
     void saveAllNotes();
     void openNote();
     void closeTab(int index);
+    void closeCurrentTab();
     void toggleVisibility();
     void showSettingsDialog();
+    void showAboutDialog();
 
 private:
     void loadLastSession();

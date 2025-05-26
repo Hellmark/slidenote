@@ -19,6 +19,7 @@
 #include <QFileInfo>
 #include <QTabWidget>
 #include <QTimer>
+#include <QShortcut>
 
 SlideWindow::SlideWindow(QWidget *parent)
     : QWidget(parent),
@@ -42,6 +43,16 @@ SlideWindow::SlideWindow(QWidget *parent)
 }
 
 void SlideWindow::setupUI() {
+    // Keyboard shortcuts
+    new QShortcut(QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
+    new QShortcut(QKeySequence("Ctrl+O"), this, SLOT(openNote()));
+    new QShortcut(QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
+    new QShortcut(QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
+    new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(closeCurrentTab()));
+    new QShortcut(QKeySequence("Ctrl+Q"), this, SLOT(close()));
+    new QShortcut(QKeySequence("Ctrl+,"), this, SLOT(showSettingsDialog()));
+    new QShortcut(QKeySequence("F1"), this, SLOT(showAboutDialog()));
+
     m_contentWidget = new QWidget(this);
     m_contentWidget->setStyleSheet("background-color: palette(window);");
     m_contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -285,11 +296,13 @@ void SlideWindow::setupTrayIcon() {
     QMenu *trayMenu = new QMenu(this);
     QAction *toggleAction = trayMenu->addAction("Toggle Window");
     QAction *settingsAction = trayMenu->addAction("Settings");
+    QAction *aboutAction = trayMenu->addAction("About");
     trayMenu->addSeparator();
     QAction *exitAction = trayMenu->addAction("Exit");
 
     connect(toggleAction, &QAction::triggered, this, &SlideWindow::toggleVisibility);
     connect(settingsAction, &QAction::triggered, this, &SlideWindow::showSettingsDialog);
+    connect(aboutAction, &QAction::triggered, this, &SlideWindow::showAboutDialog);
     connect(exitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     m_trayIcon = new QSystemTrayIcon(this);
@@ -318,7 +331,6 @@ void SlideWindow::showSettingsDialog() {
     dlg.setHotkeySequence(m_hotkeySequence);
     dlg.setScreenIndex(m_screenIndex);
 
-
     if (dlg.exec() == QDialog::Accepted) {
         m_direction = static_cast<SlideDirection>(dlg.slideDirection());
         m_heightPercent = dlg.heightPercent() / 100.0;
@@ -328,7 +340,6 @@ void SlideWindow::showSettingsDialog() {
         m_reopenLastSession = dlg.reopenLastSession();
         m_autosaveInterval = dlg.autosaveInterval();
         m_autosaveTimer->start(m_autosaveInterval * 1000);
-
 
         setupHotkey();
         applyGeometryAndPosition();
@@ -400,4 +411,18 @@ void SlideWindow::saveLastSession() {
 
 SlideWindow::~SlideWindow() {
     saveLastSession();
+}
+
+void SlideWindow::showAboutDialog() {
+    QMessageBox::about(this, "About Slidenote",
+        "Slidenote v1.0\n"
+        "© 2025 Hellmark Programming Group\n\n"
+        "A simple note utility that never leaves your side!");
+}
+
+void SlideWindow::closeCurrentTab() {
+    int index = m_tabWidget->currentIndex();
+    if (index >= 0) {
+        closeTab(index);
+    }
 }
