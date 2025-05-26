@@ -1,11 +1,11 @@
 
 #include "SlideWindow.h"
-#include <QPropertyAnimation>
 #include "SettingsDialog.h"
 
 #include <QApplication>
 #include <QScreen>
 #include <QCursor>
+#include <QPropertyAnimation>
 #include <QVBoxLayout>
 #include <QTextEdit>
 #include <QToolBar>
@@ -83,6 +83,9 @@ void SlideWindow::setupUI() {
     outerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->addWidget(m_contentWidget);
     setLayout(outerLayout);
+    m_autosaveTimer = new QTimer(this);
+    connect(m_autosaveTimer, &QTimer::timeout, this, &SlideWindow::saveLastSession);
+    m_autosaveTimer->start(m_autosaveInterval * 1000); // every 60 seconds
 }
 
 void SlideWindow::addNewTab() {
@@ -315,6 +318,7 @@ void SlideWindow::showSettingsDialog() {
     dlg.setHotkeySequence(m_hotkeySequence);
     dlg.setScreenIndex(m_screenIndex);
 
+
     if (dlg.exec() == QDialog::Accepted) {
         m_direction = static_cast<SlideDirection>(dlg.slideDirection());
         m_heightPercent = dlg.heightPercent() / 100.0;
@@ -322,6 +326,9 @@ void SlideWindow::showSettingsDialog() {
         m_hotkeySequence = dlg.hotkeySequence();
         m_screenIndex = dlg.screenIndex();
         m_reopenLastSession = dlg.reopenLastSession();
+        m_autosaveInterval = dlg.autosaveInterval();
+        m_autosaveTimer->start(m_autosaveInterval * 1000);
+
 
         setupHotkey();
         applyGeometryAndPosition();
@@ -337,6 +344,7 @@ void SlideWindow::saveSettings() {
     settings.setValue("hotkey", m_hotkeySequence);
     settings.setValue("screenIndex", m_screenIndex);
     settings.setValue("reopenLastSession", m_reopenLastSession);
+    settings.setValue("autosaveInterval", m_autosaveInterval);
 }
 
 void SlideWindow::loadSettings() {
@@ -347,6 +355,7 @@ void SlideWindow::loadSettings() {
     m_hotkeySequence = settings.value("hotkey", "Ctrl+Alt+S").toString();
     m_screenIndex = settings.value("screenIndex", 0).toInt();
     m_reopenLastSession = settings.value("reopenLastSession", true).toBool();
+    m_autosaveInterval = settings.value("autosaveInterval", 60).toInt();
 }
 
 

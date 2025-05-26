@@ -53,6 +53,8 @@ private:
     QPropertyAnimation *m_animation;
     QSystemTrayIcon *m_trayIcon;
     QHotkey *m_hotkey;
+    QTimer *m_autosaveTimer;
+
 
     SlideDirection m_direction;
     double m_heightPercent;
@@ -61,6 +63,7 @@ private:
     int m_screenIndex;
     bool m_isSliding;
     bool m_reopenLastSession;
+    int m_autosaveInterval = 60;
 };
 
 #endif // SLIDEWINDOW_H

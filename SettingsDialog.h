@@ -33,6 +33,9 @@ public:
     void setReopenLastSession(bool enabled);
     bool reopenLastSession() const;
 
+    void setAutosaveInterval(int seconds);
+    int autosaveInterval() const;
+
 private:
     QCheckBox *reopenCheck;
     QComboBox *directionCombo;
@@ -40,6 +43,7 @@ private:
     QSpinBox *widthSpin;
     QKeySequenceEdit *hotkeyEdit;
     QComboBox *screenCombo;
+    QSpinBox *autosaveSpin;
 };
 
 #endif // SETTINGSDIALOG_H

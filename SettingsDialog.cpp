@@ -38,6 +38,12 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     reopenCheck = new QCheckBox("Reopen last session");
 
+    QLabel *savedurLabel = new QLabel("Autosave Interval:");
+    autosaveSpin = new QSpinBox();
+    autosaveSpin->setRange(10, 3600);
+    autosaveSpin->setValue(60);
+    autosaveSpin->setSuffix(" sec");
+
     QPushButton *okButton = new QPushButton("OK");
     QPushButton *cancelButton = new QPushButton("Cancel");
 
@@ -56,6 +62,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     layout->addWidget(screenLabel);
     layout->addWidget(screenCombo);
     layout->addWidget(reopenCheck);
+    layout->addWidget(savedurLabel);
+    layout->addWidget(autosaveSpin);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(okButton);
@@ -106,4 +114,11 @@ void SettingsDialog::setReopenLastSession(bool enabled) {
 }
 bool SettingsDialog::reopenLastSession() const {
     return reopenCheck->isChecked();
+}
+
+void SettingsDialog::setAutosaveInterval(int seconds) {
+    autosaveSpin->setValue(seconds);
+}
+int SettingsDialog::autosaveInterval() const {
+    return autosaveSpin->value();
 }
