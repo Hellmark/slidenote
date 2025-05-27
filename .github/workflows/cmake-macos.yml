@@ -1,0 +1,29 @@
+name: Build Slidenote (macOS + Qt 6)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Install Qt 6 and build tools
+      run: |
+        brew update
+        brew install cmake ninja qt6
+
+    - name: Configure with CMake
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_PREFIX_PATH="$(brew --prefix qt6)"
+
+    - name: Build project
+      run: cmake --build build
