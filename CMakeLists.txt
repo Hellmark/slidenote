@@ -35,3 +35,4 @@ add_executable(Slidenote
 )
 
 target_link_libraries(Slidenote Qt6::Core Qt6::Gui Qt6::Widgets QHotkey ${EXTRA_LIBS})
+target_include_directories(Slidenote PUBLIC ${QHotkey_SOURCE_DIR}/QHotkey)
