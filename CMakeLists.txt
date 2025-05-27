@@ -13,7 +13,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 include(FetchContent)
 FetchContent_Declare(
     QHotkey
-    GIT_REPOSITORY https://github.com/Skycoder42/QHotkey.git
+    GIT_REPOSITORY https://github.com/Hellmark/QHotkey.git
     GIT_TAG master
 )
 FetchContent_MakeAvailable(QHotkey)
