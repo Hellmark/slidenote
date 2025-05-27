@@ -45,7 +45,7 @@ SlideWindow::SlideWindow(QWidget *parent)
 void SlideWindow::setupUI() {
     // Keyboard shortcuts
     new QShortcut(QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
-    new QShortcut(QKeySequence("Ctrl+O"), this, SLOT(openNote()));
+    new QShortcut(QKeySequence(tr("Ctrl+O","File|Open")), this, SLOT(openNote()));
     new QShortcut(QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
     new QShortcut(QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
     new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(closeCurrentTab()));
@@ -58,18 +58,32 @@ void SlideWindow::setupUI() {
     m_contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_toolBar = new QToolBar(m_contentWidget);
+    m_toolBar->setStyleSheet("border: none;"
+                               "background-color: transparent;");
     m_tabWidget = new QTabWidget(m_contentWidget);
 
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setMovable(true);
     connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, &SlideWindow::closeTab);
 
+    //m_toolbar->setStyleSheet("QToolButton { background-color: transparent; }");
+
     QAction *newNoteAction = m_toolBar->addAction(QIcon::fromTheme("document-new"), "New Note");
     QAction *openNoteAction = m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open Note");
     QAction *saveAction = m_toolBar->addAction(QIcon::fromTheme("document-save"), "Save");
-    QAction *saveAllAction = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
+    QAction *saveAllAction = nullptr;
+    if (QIcon::hasThemeIcon("document-save-all")){
+        saveAllAction = m_toolBar->addAction(QIcon::fromTheme("document-save-all"), "Save All");
+      } else {
+        saveAllAction = m_toolBar->addAction(QIcon::fromTheme("edit-copy"), "Save All");
+    }
     m_toolBar->addSeparator();
-    QAction *settingsAction = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
+    QAction *settingsAction = nullptr;
+    if (QIcon::hasThemeIcon("preferences-system")){
+        settingsAction = m_toolBar->addAction(QIcon::fromTheme("preferences-system"), "Settings");
+      } else {
+        settingsAction = m_toolBar->addAction(QIcon::fromTheme("help-about"), "Settings");
+    }
     m_toolBar->addSeparator();
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
