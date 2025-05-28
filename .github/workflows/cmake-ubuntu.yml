@@ -1,4 +1,4 @@
-name: CMake for Ubuntu
+name: Build Slidenote (Ubuntu)
 
 on:
   push:
