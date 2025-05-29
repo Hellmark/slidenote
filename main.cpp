@@ -13,6 +13,11 @@ int main(int argc, char *argv[]) {
     QApplication::setQuitOnLastWindowClosed(false);
 
     SlideWindow window;
-    window.hide(); // start hidden
+    if (window.shouldStartVisible()) {
+        window.show();
+    } else {
+        window.hide();
+    }
+    //window.hide(); // start hidden
     return app.exec();
 }

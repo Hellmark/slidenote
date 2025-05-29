@@ -11,7 +11,7 @@
 
 class SettingsDialog : public QDialog {
     Q_OBJECT
-    
+
 public:
     explicit SettingsDialog(QWidget *parent = nullptr);
 
@@ -36,6 +36,9 @@ public:
     void setAutosaveInterval(int seconds);
     int autosaveInterval() const;
 
+    bool startVisible() const;
+    void setStartVisible(bool visible);
+
 private:
     QCheckBox *reopenCheck;
     QComboBox *directionCombo;
@@ -44,6 +47,7 @@ private:
     QKeySequenceEdit *hotkeyEdit;
     QComboBox *screenCombo;
     QSpinBox *autosaveSpin;
+    QCheckBox *startVisibleCheck;
 };
 
 #endif // SETTINGSDIALOG_H

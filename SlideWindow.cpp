@@ -32,7 +32,6 @@ SlideWindow::SlideWindow(QWidget *parent)
       m_trayIcon(nullptr),
       m_animation(new QPropertyAnimation(this, "pos", this))
 {
-    //setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -41,6 +40,13 @@ SlideWindow::SlideWindow(QWidget *parent)
     loadSettings();
     setupHotkey();
     applyGeometryAndPosition();
+    if (m_startVisible) {
+        qDebug("StartVisible");
+        QTimer::singleShot(0, this, [this]() {
+        animateSlide(true);
+        });
+        qDebug("Timer elapsed");
+    }
 }
 
 void SlideWindow::setupUI() {
@@ -62,6 +68,7 @@ void SlideWindow::setupUI() {
         QMenu *helpMenu = m_menuBar->addMenu("Help");
         helpMenu->addAction("About", QKeySequence("F1"), this, SLOT(showAboutDialog()));
     #endif
+
     // Keyboard shortcuts
     new QShortcut(QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
     new QShortcut(QKeySequence(tr("Ctrl+O","File|Open")), this, SLOT(openNote()));
@@ -84,8 +91,6 @@ void SlideWindow::setupUI() {
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setMovable(true);
     connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, &SlideWindow::closeTab);
-
-    //m_toolbar->setStyleSheet("QToolButton { background-color: transparent; }");
 
     QAction *newNoteAction = m_toolBar->addAction(QIcon::fromTheme("document-new"), "New Note");
     QAction *openNoteAction = m_toolBar->addAction(QIcon::fromTheme("document-open"), "Open Note");
@@ -357,22 +362,25 @@ void SlideWindow::setupHotkey() {
 void SlideWindow::showSettingsDialog() {
     SettingsDialog dlg(this);
     QSettings settings("Hellmark Programming Group", "Slidenote");
-    dlg.setReopenLastSession(settings.value("reopenLastSession", false).toBool());
+
+    dlg.setScreenIndex(m_screenIndex);
     dlg.setSlideDirection(static_cast<int>(m_direction));
     dlg.setHeightPercent(m_heightPercent * 100);
     dlg.setWidthPercent(m_widthPercent * 100);
     dlg.setHotkeySequence(m_hotkeySequence);
-    dlg.setScreenIndex(m_screenIndex);
+    dlg.setStartVisible(m_startVisible);
+    dlg.setReopenLastSession(settings.value("reopenLastSession", false).toBool());
 
     if (dlg.exec() == QDialog::Accepted) {
+        m_screenIndex = dlg.screenIndex();
         m_direction = static_cast<SlideDirection>(dlg.slideDirection());
         m_heightPercent = dlg.heightPercent() / 100.0;
         m_widthPercent = dlg.widthPercent() / 100.0;
         m_hotkeySequence = dlg.hotkeySequence();
-        m_screenIndex = dlg.screenIndex();
-        m_reopenLastSession = dlg.reopenLastSession();
         m_autosaveInterval = dlg.autosaveInterval();
         m_autosaveTimer->start(m_autosaveInterval * 1000);
+        m_startVisible = dlg.startVisible();
+        m_reopenLastSession = dlg.reopenLastSession();
 
         setupHotkey();
         applyGeometryAndPosition();
@@ -382,24 +390,26 @@ void SlideWindow::showSettingsDialog() {
 
 void SlideWindow::saveSettings() {
     QSettings settings("Hellmark Programming Group", "Slidenote");
+    settings.setValue("autosaveInterval", m_autosaveInterval);
     settings.setValue("direction", static_cast<int>(m_direction));
     settings.setValue("height", m_heightPercent);
     settings.setValue("width", m_widthPercent);
     settings.setValue("hotkey", m_hotkeySequence);
     settings.setValue("screenIndex", m_screenIndex);
+    settings.setValue("startVisible", m_startVisible);
     settings.setValue("reopenLastSession", m_reopenLastSession);
-    settings.setValue("autosaveInterval", m_autosaveInterval);
 }
 
 void SlideWindow::loadSettings() {
     QSettings settings("Hellmark Programming Group", "Slidenote");
+    m_screenIndex = settings.value("screenIndex", 0).toInt();
     m_direction = static_cast<SlideDirection>(settings.value("direction", static_cast<int>(Left)).toInt());
     m_heightPercent = settings.value("height", 0.75).toDouble();
     m_widthPercent = settings.value("width", 0.3).toDouble();
     m_hotkeySequence = settings.value("hotkey", "Ctrl+Alt+S").toString();
-    m_screenIndex = settings.value("screenIndex", 0).toInt();
-    m_reopenLastSession = settings.value("reopenLastSession", true).toBool();
     m_autosaveInterval = settings.value("autosaveInterval", 60).toInt();
+    m_startVisible = settings.value("startVisible", true).toBool();
+    m_reopenLastSession = settings.value("reopenLastSession", true).toBool();
 }
 
 

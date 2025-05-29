@@ -19,6 +19,7 @@ public:
     ~SlideWindow();
     enum SlideDirection { Left, Right, Top, Bottom };
     SlideWindow(QWidget *parent = nullptr);
+    bool shouldStartVisible() const { return m_startVisible; }
 
 private slots:
     void addNewTab();
@@ -61,13 +62,13 @@ private:
         QMenuBar *m_menuBar = nullptr;
     #endif
 
-
     SlideDirection m_direction;
     double m_heightPercent;
     double m_widthPercent;
     QString m_hotkeySequence;
     int m_screenIndex;
     bool m_isSliding;
+    bool m_startVisible;
     bool m_reopenLastSession;
     int m_autosaveInterval = 60;
 };
