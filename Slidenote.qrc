@@ -1,12 +1,14 @@
 <RCC>
     <qresource prefix="/">
-        <file>Slidenote-16.png</file>
-        <file>Slidenote-22.png</file>
-        <file>Slidenote-32.png</file>
-        <file>Slidenote-48.png</file>
-        <file>Slidenote-64.png</file>
-        <file>Slidenote-128.png</file>
-        <file>Slidenote-256.png</file>
-        <file>Slidenote.svg</file>
+        <file>resources/Slidenote-16.png</file>
+        <file>resources/Slidenote-22.png</file>
+        <file>resources/Slidenote-32.png</file>
+        <file>resources/Slidenote-48.png</file>
+        <file>resources/Slidenote-64.png</file>
+        <file>resources/Slidenote-128.png</file>
+        <file>resources/Slidenote-256.png</file>
+        <file>resources/Slidenote-512.png</file>
+        <file>resources/Slidenote-1024.png</file>
+        <file>resources/Slidenote.svg</file>
     </qresource>
 </RCC>

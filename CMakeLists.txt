@@ -35,8 +35,8 @@ set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
 set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
 
 # Set icon and Info.plist if present
-set(APP_ICON_MAC "${CMAKE_SOURCE_DIR}/Slidenote.icns")
-set(MY_INFO_PLIST "${CMAKE_SOURCE_DIR}/Info.plist")
+set(APP_ICON_MAC "${CMAKE_SOURCE_DIR}/resources/Slidenote.icns")
+set(MY_INFO_PLIST "${CMAKE_SOURCE_DIR}/resources/Info.plist")
 if(APPLE AND EXISTS "${APP_ICON_MAC}")
     set_source_files_properties(${APP_ICON_MAC} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
