@@ -40,13 +40,6 @@ SlideWindow::SlideWindow(QWidget *parent)
     loadSettings();
     setupHotkey();
     applyGeometryAndPosition();
-    if (m_startVisible) {
-        qDebug("StartVisible");
-        QTimer::singleShot(0, this, [this]() {
-        animateSlide(true);
-        });
-        qDebug("Timer elapsed");
-    }
 }
 
 void SlideWindow::setupUI() {
@@ -134,7 +127,7 @@ void SlideWindow::setupUI() {
     setLayout(outerLayout);
     m_autosaveTimer = new QTimer(this);
     connect(m_autosaveTimer, &QTimer::timeout, this, &SlideWindow::saveLastSession);
-    m_autosaveTimer->start(m_autosaveInterval * 1000); // every 60 seconds
+    m_autosaveTimer->start(m_autosaveInterval * 1000);
 }
 
 void SlideWindow::addNewTab() {
