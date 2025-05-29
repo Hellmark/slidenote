@@ -10,6 +10,7 @@ class QToolBar;
 class QPropertyAnimation;
 class QSystemTrayIcon;
 class QHotkey;
+class QMenuBar;
 
 class SlideWindow : public QWidget {
     Q_OBJECT
@@ -56,6 +57,9 @@ private:
     QSystemTrayIcon *m_trayIcon;
     QHotkey *m_hotkey;
     QTimer *m_autosaveTimer;
+    #ifdef Q_OS_MAC
+        QMenuBar *m_menuBar = nullptr;
+    #endif
 
 
     SlideDirection m_direction;

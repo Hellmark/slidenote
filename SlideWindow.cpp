@@ -1,4 +1,3 @@
-
 #include "SlideWindow.h"
 #include "SettingsDialog.h"
 
@@ -13,6 +12,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMenu>
+#include <QMenuBar>
 #include <QSystemTrayIcon>
 #include <QHotkey>
 #include <QSettings>
@@ -32,7 +32,8 @@ SlideWindow::SlideWindow(QWidget *parent)
       m_trayIcon(nullptr),
       m_animation(new QPropertyAnimation(this, "pos", this))
 {
-    setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    //setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
     setupUI();
@@ -43,6 +44,24 @@ SlideWindow::SlideWindow(QWidget *parent)
 }
 
 void SlideWindow::setupUI() {
+    // Menubar for MacOS
+    #ifdef Q_OS_MAC
+        m_menuBar = new QMenuBar(this);
+
+        QMenu *fileMenu = m_menuBar->addMenu("File");
+        fileMenu->addAction("New Note", QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
+        fileMenu->addAction("Open...", QKeySequence("Ctrl+O"), this, SLOT(openNote()));
+        fileMenu->addAction("Save", QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
+        fileMenu->addAction("Save All", QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
+        fileMenu->addSeparator();
+        fileMenu->addAction("Exit", QKeySequence("Ctrl+Q"), qApp, SLOT(quit()));
+
+        QMenu *editMenu = m_menuBar->addMenu("Edit");
+        editMenu->addAction("Settings", QKeySequence("Ctrl+,"), this, SLOT(showSettingsDialog()));
+
+        QMenu *helpMenu = m_menuBar->addMenu("Help");
+        helpMenu->addAction("About", QKeySequence("F1"), this, SLOT(showAboutDialog()));
+    #endif
     // Keyboard shortcuts
     new QShortcut(QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
     new QShortcut(QKeySequence(tr("Ctrl+O","File|Open")), this, SLOT(openNote()));
