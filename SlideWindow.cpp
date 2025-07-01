@@ -337,7 +337,7 @@ void SlideWindow::setupTrayIcon() {
     connect(exitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     m_trayIcon = new QSystemTrayIcon(this);
-    m_trayIcon->setIcon(QIcon(":/Slidenote.svg"));
+    m_trayIcon->setIcon(QIcon(":/resources/Slidenote.svg"));
     m_trayIcon->setContextMenu(trayMenu);
     m_trayIcon->show();
 }
