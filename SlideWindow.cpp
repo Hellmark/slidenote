@@ -38,6 +38,7 @@ SlideWindow::SlideWindow(QWidget *parent)
     setupUI();
     setupTrayIcon();
     loadSettings();
+    m_autosaveTimer->start(m_autosaveInterval * 1000); // apply saved interval (setupUI started it at the default)
     setupHotkey();
     applyGeometryAndPosition();
 }
