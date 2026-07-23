@@ -7,3 +7,4 @@
 - Standard shortcuts guarded behind #ifndef Q_OS_MAC (menu owns them on Mac) to prevent unintentional overloading.
 - Save path for each tab in saveLastSession; restore into m_filePaths in loadLastSession.
 - Prevents crash if there's a null widget for close tab.
+- Iterate version.
