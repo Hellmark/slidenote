@@ -361,6 +361,7 @@ void SlideWindow::showSettingsDialog() {
     dlg.setHeightPercent(m_heightPercent * 100);
     dlg.setWidthPercent(m_widthPercent * 100);
     dlg.setHotkeySequence(m_hotkeySequence);
+    dlg.setAutosaveInterval(m_autosaveInterval);
     dlg.setStartVisible(m_startVisible);
     dlg.setReopenLastSession(settings.value("reopenLastSession", false).toBool());
 
