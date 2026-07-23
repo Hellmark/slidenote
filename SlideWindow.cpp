@@ -58,6 +58,7 @@ void SlideWindow::setupUI() {
         fileMenu->addAction("Save", QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
         fileMenu->addAction("Save All", QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
         fileMenu->addSeparator();
+        fileMenu->addAction("Close Tab", QKeySequence("Ctrl+W"), this, SLOT(closeCurrentTab()));
         fileMenu->addAction("Exit", QKeySequence("Ctrl+Q"), qApp, SLOT(quit()));
 
         QMenu *editMenu = m_menuBar->addMenu("Edit");
@@ -68,14 +69,17 @@ void SlideWindow::setupUI() {
     #endif
 
     // Keyboard shortcuts
-    new QShortcut(QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
-    new QShortcut(QKeySequence(tr("Ctrl+O","File|Open")), this, SLOT(openNote()));
-    new QShortcut(QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
-    new QShortcut(QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
-    new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(closeCurrentTab()));
-    new QShortcut(QKeySequence("Ctrl+Q"), this, &QApplication::quit);
-    new QShortcut(QKeySequence("Ctrl+,"), this, SLOT(showSettingsDialog()));
-    new QShortcut(QKeySequence("F1"), this, SLOT(showAboutDialog()));
+    // preventing "ambiguous shortcut overload" on MacOS
+    #ifndef Q_OS_MAC
+        new QShortcut(QKeySequence("Ctrl+N"), this, SLOT(addNewTab()));
+        new QShortcut(QKeySequence(tr("Ctrl+O","File|Open")), this, SLOT(openNote()));
+        new QShortcut(QKeySequence("Ctrl+S"), this, SLOT(saveCurrentNote()));
+        new QShortcut(QKeySequence("Ctrl+Shift+S"), this, SLOT(saveAllNotes()));
+        new QShortcut(QKeySequence("Ctrl+W"), this, SLOT(closeCurrentTab()));
+        new QShortcut(QKeySequence("Ctrl+Q"), this, &QApplication::quit);
+        new QShortcut(QKeySequence("Ctrl+,"), this, SLOT(showSettingsDialog()));
+        new QShortcut(QKeySequence("F1"), this, SLOT(showAboutDialog()));
+    #endif
 
     m_contentWidget = new QWidget(this);
     m_contentWidget->setStyleSheet("background-color: palette(window);");
