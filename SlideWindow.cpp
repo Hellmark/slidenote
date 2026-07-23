@@ -155,6 +155,8 @@ void SlideWindow::applyGeometryAndPosition() {
     QScreen *screen = (m_screenIndex == 0)
         ? QGuiApplication::screenAt(QCursor::pos())
         : QGuiApplication::screens().value(m_screenIndex - 1, QGuiApplication::primaryScreen());
+    if (!screen) screen = QGuiApplication::primaryScreen();
+    if (!screen) return; // no screens available
 
     QRect geometry = screen->geometry();
     int h = geometry.height() * m_heightPercent;
