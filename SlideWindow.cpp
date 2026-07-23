@@ -319,7 +319,10 @@ void SlideWindow::closeTab(int index) {
 
 void SlideWindow::toggleVisibility() {
     qDebug() << "Toggling to:" << (!isVisible());
-    if (m_isSliding) qDebug() << "Blocked: already sliding";
+    if (m_isSliding) {
+        qDebug() << "Blocked: already sliding";
+        return;
+    }
     m_isSliding = true;
     animateSlide(!isVisible());
 }
