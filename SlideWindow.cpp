@@ -41,6 +41,10 @@ SlideWindow::SlideWindow(QWidget *parent)
     m_autosaveTimer->start(m_autosaveInterval * 1000); // apply saved interval (setupUI started it at the default)
     setupHotkey();
     applyGeometryAndPosition();
+
+    if (m_startVisible) {
+        animateSlide(true);
+    }
 }
 
 void SlideWindow::setupUI() {
