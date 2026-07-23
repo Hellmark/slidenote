@@ -322,6 +322,7 @@ void SlideWindow::saveAllNotes() {
 
 void SlideWindow::closeTab(int index) {
     QWidget *widget = m_tabWidget->widget(index);
+    if (!widget) return; // invalid index — nothing to close
     QTextEdit *edit = qobject_cast<QTextEdit*>(widget);
     if (edit)
         m_filePaths.remove(edit);
