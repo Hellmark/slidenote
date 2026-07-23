@@ -187,6 +187,8 @@ void SlideWindow::animateSlide(bool visible) {
     QScreen *screen = (m_screenIndex == 0)
         ? QGuiApplication::screenAt(QCursor::pos())
         : QGuiApplication::screens().value(m_screenIndex - 1, QGuiApplication::primaryScreen());
+    if (!screen) screen = QGuiApplication::primaryScreen();
+    if (!screen) return; // no screens available
 
     QRect screenGeometry = screen->geometry();
     int h = screenGeometry.height() * m_heightPercent;
