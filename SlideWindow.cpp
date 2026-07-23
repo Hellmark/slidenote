@@ -473,7 +473,7 @@ SlideWindow::~SlideWindow() {
 void SlideWindow::showAboutDialog() {
     QMessageBox::about(this, "About Slidenote",
         "Slidenote v1.0.1\n"
-        "© 2025 Hellmark Programming Group\n\n"
+        "© 2026 Hellmark Programming Group\n\n"
         "A simple note utility that never leaves your side!");
 }
 
