@@ -437,11 +437,13 @@ void SlideWindow::loadLastSession() {
         settings.setArrayIndex(i);
         QString title = settings.value("title").toString();
         QString content = settings.value("content").toString();
+        QString path = settings.value("path").toString();
 
         QTextEdit *edit = new QTextEdit(this);
         edit->setPlainText(content);
         int index = m_tabWidget->addTab(edit, title);
         m_tabWidget->setCurrentIndex(index);
+        m_filePaths[edit] = path;
         connect(edit, &QTextEdit::textChanged, this, &SlideWindow::onTextChanged);
     }
 
@@ -458,6 +460,7 @@ void SlideWindow::saveLastSession() {
         settings.setArrayIndex(i);
         settings.setValue("title", m_tabWidget->tabText(i));
         settings.setValue("content", edit->toPlainText());
+        settings.setValue("path", m_filePaths.value(edit));
     }
     settings.endArray();
 }
